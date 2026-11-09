@@ -51,6 +51,22 @@ const positionsList = document.getElementById("positionsList");
 
 // MARK: - Inicialización
 function init() {
+  // 0. Auto-importación desde hash de enlace (#data=...)
+  if (window.location.hash.startsWith("#data=")) {
+    try {
+      const hashPart = window.location.hash.substring(6);
+      const jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(hashPart))));
+      const imported = JSON.parse(jsonStr);
+      if (Array.isArray(imported) && imported.length > 0) {
+        positions = imported;
+        localStorage.setItem("saved_positions", JSON.stringify(positions));
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    } catch (e) {
+      console.warn("Error leyendo hash:", e);
+    }
+  }
+
   // 1. Service Worker para modo offline PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -73,6 +89,37 @@ function init() {
     localStorage.setItem("pc_server_ip", pcHost);
     syncWithPC(true);
   });
+
+  const importCodeInput = document.getElementById("importCodeInput");
+  const btnImportCode = document.getElementById("btnImportCode");
+  if (btnImportCode) {
+    btnImportCode.addEventListener("click", () => {
+      const raw = (importCodeInput.value || "").trim();
+      if (!raw) return;
+      try {
+        let jsonStr = raw;
+        if (raw.includes("#data=")) {
+          const part = raw.split("#data=")[1];
+          jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(part))));
+        } else if (!raw.startsWith("[")) {
+          jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(raw))));
+        }
+        const imported = JSON.parse(jsonStr);
+        if (Array.isArray(imported) && imported.length > 0) {
+          positions = imported;
+          localStorage.setItem("saved_positions", JSON.stringify(positions));
+          statusDot.classList.remove("offline");
+          closeSettings();
+          fetchLivePrices();
+          alert("¡Portafolio cargado con éxito!");
+        } else {
+          alert("El código no contiene posiciones válidas.");
+        }
+      } catch (err) {
+        alert("Código no reconocido. Asegúrate de pegarlo completo.");
+      }
+    });
+  }
   btnShowAddCoin.addEventListener("click", () => {
     addCoinForm.classList.toggle("hidden");
   });
