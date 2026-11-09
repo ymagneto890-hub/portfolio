@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Portafolio</title>
+
+  <!-- PWA & Apple Web App Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Portafolio">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
+  <!-- Estilos CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- MARK: Barra Superior Minimalista -->
+    <header class="app-header">
+      <div class="header-left">
+        <span id="statusDot" class="status-dot"></span>
+        <span class="app-title">PORTAFOLIO</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Conmutador Divisa EUR / USD -->
+        <button id="btnCurrency" class="pill-btn" aria-label="Cambiar Divisa">€ EUR</button>
+
+        <!-- Botón Actualizar / Sincronizar -->
+        <button id="btnSync" class="icon-btn" aria-label="Sincronizar">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+
+        <!-- Botón Ajustes -->
+        <button id="btnSettings" class="icon-btn" aria-label="Ajustes">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MARK: Gráfica Donut Interactiva XL -->
+    <section class="donut-section">
+      <div class="donut-box">
+        <svg id="donutSvg" viewBox="0 0 200 200" class="donut-svg">
+          <circle class="donut-bg-track" cx="100" cy="100" r="78"></circle>
+          <g id="donutSlices"></g>
+        </svg>
+
+        <!-- Centro interactivo -->
+        <div id="donutCenter" class="donut-center" title="Pulsa para deseleccionar">
+          <!-- Vista Global -->
+          <div id="globalCenterView" class="center-view">
+            <span class="center-sub">PORTAFOLIO</span>
+            <span id="totalValue" class="center-val">0 €</span>
+            <span id="totalPnlBadge" class="center-badge badge-neutral">+0 € (+0.0%)</span>
+          </div>
+
+          <!-- Vista Activo Seleccionado -->
+          <div id="selectedCenterView" class="center-view hidden">
+            <div class="sel-title">
+              <span id="selDot" class="sel-dot">●</span>
+              <span id="selCoinName">BTC</span> • <span id="selShare">0%</span>
+            </div>
+            <span id="selVal" class="center-val">0 €</span>
+            <span id="selInv" class="sel-inv">Inv: 0 €</span>
+            <span id="selPnlBadge" class="center-badge badge-neutral">+0.0%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARK: Cuadrícula en 2 Columnas de Activos -->
+    <main class="grid-section">
+      <div id="assetsGrid" class="assets-grid">
+        <!-- Tarjetas dinámicas inyectadas por app.js -->
+      </div>
+    </main>
+
+    <!-- MARK: Modal de Ajustes y Gestión -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Ajustes</h3>
+          <button id="btnCloseSettings" class="close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Sección Sincronizar PC -->
+          <div class="setting-group">
+            <label class="setting-label">Sincronizar con PC (Wi-Fi Local)</label>
+            <div class="input-row">
+              <input type="text" id="pcIpInput" placeholder="192.168.1.128:8765" value="192.168.1.128:8765">
+              <button id="btnModalSync" class="action-btn">Sincronizar</button>
+            </div>
+            <span class="setting-hint">Trae tus monedas del widget del ordenador con 1 clic.</span>
+          </div>
+
+          <hr class="modal-divider">
+
+          <!-- Sección Mis Activos -->
+          <div class="setting-group">
+            <div class="flex-between">
+              <label class="setting-label">Mis Posiciones Guardadas</label>
+              <button id="btnShowAddCoin" class="add-coin-btn">+ Añadir Moneda</button>
+            </div>
+
+            <div id="addCoinForm" class="add-form hidden">
+              <input type="text" id="newCoinSymbol" placeholder="Símbolo (ej: SOL, BTC)" maxlength="8">
+              <div class="form-row">
+                <input type="number" id="newCoinInv" placeholder="Invertido (ej: 250)" step="any">
+                <input type="number" id="newCoinEp" placeholder="Precio compra (ej: 180)" step="any">
+              </div>
+              <div class="form-row">
+                <select id="newCoinCurrency">
+                  <option value="EUR">Euros (€)</option>
+                  <option value="USD">Dólares ($)</option>
+                </select>
+                <select id="newCoinSource">
+                  <option value="binance">Binance (Cripto)</option>
+                  <option value="yahoo">Yahoo Finance (Acción/Oro)</option>
+                </select>
+              </div>
+              <button id="btnSaveCoin" class="save-coin-btn">Guardar Activo</button>
+            </div>
+
+            <div id="positionsList" class="positions-list">
+              <!-- Lista de monedas con botón de eliminar -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Principal -->
+  <script src="app.js"></script>
+</body>
+</html>
